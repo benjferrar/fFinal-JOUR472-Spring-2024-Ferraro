@@ -70,11 +70,16 @@ without_parole |>
 
 ### Sentence 2
 
--   **Sentence text**: [Paste in sentence to engineer here]
--   **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
+-   **Sentence text**: "More than half of the people serving life is Lousiana were convicted of second-degree murder, our investigation found.
+-   **Analysis summary**: I didn't get the answer, having some errors.
 
 ```{r}
 # Put code to reverse engineer sentence here
+
+without_parole |>
+  filter(offense= 'Second Degree Murder') |> 
+  group_by('DOC NUMBER') |>
+  summarize(count=n(0.5))
 
 # Display results of code below this codeblock
 
@@ -82,11 +87,16 @@ without_parole |>
 
 ### Sentence 3
 
--   **Sentence text**: [Paste in sentence to engineer here]
--   **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
+-   **Sentence text**: ...Including over three-quarters of the 124 women serving life (this is part of a sentence talking about people convicted of second-degree murder)
+-   **Analysis summary**: Three-quarters of the 124 women would total 96.
 
 ```{r}
 # Put code to reverse engineer sentence here
+
+parole |>
+  filter(gender) |>
+  summarize(count=n(96))
+
 
 # Display results of code below this codeblock
 
