@@ -1,0 +1,183 @@
+---
+title: "Reverse Engineering Project"
+author: "Shifra Dayak, Benjamin Ferraro, Timothy Williams"
+date: "3/26/24"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In this notebook, we are reverse engineering the story, [Her Baby Died After Hurricane Katrina. Was It a Crime?](https://www.themarshallproject.org/2021/12/16/her-baby-died-after-hurricane-katrina)
+
+## Load libraries
+
+Loading required libraries for this analysis.
+
+```{r echo=FALSE, message=FALSE}
+# Turn off scientific notation
+options(scipen=999)
+library(tidyverse)
+library(lubridate)
+library(janitor)
+
+```
+
+## Load and Cleaning Data
+
+In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data.
+
+```{r}
+# Load required data
+louisiana_parole <- read_csv("C:/Users/Benji/Documents/GitHub/fFinal-JOUR472-Spring-2024-Ferraro/major_assignments/reverse_engineering/lousiana_life_without_parole_sept_2021.csv") |>
+#age_bucket column data cleaned in OpenRefine; see Sentence 5.
+
+# Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
+
+# Clean required data and prepare for analysis if needed. 
+clean_names()
+#We already cleaned the names but included for demonstration.
+
+
+```
+
+## Sentences to Engineer
+
+In this notebook, we are reverse engineering five sentences from the story.
+
+### Sentence 1
+
+-   **Sentence text**: Nearly 4,200 men and women are serving lifetime sentences in the state, for crimes that range from homicide and rape to rarer cases of repeat purse snatchings and child neglect, an investigation by The Marshall Project and The Times-Picayune \| The Advocate found.
+-   **Analysis summary**: We bsically wanted to count the exact number of men and women serving lifetime sentenced without parole, instead of an approximate 4,200. The specific number we got was 4,177.
+
+```{r}
+# Put code to reverse engineer sentence here
+deduped_louisiana_parole <- louisiana_parole |>
+distinct(doc_number) |>
+  summarise(
+    distinct_people = n()
+  )
+
+# Display results of code below this codeblock
+
+deduped_louisiana_parole
+```
+
+### Sentence 2
+
+-   **Sentence text**: More than half of the people serving life in Louisiana were convicted of second-degree murder, our investigation found ...
+-   **Analysis summary**: We filtered by second-degree murder offense and then grouped and counted the doc numbers. Our percentage of those serving life sentences with at least one second-degree murder is 54%, or 2,242 of the inmates.
+
+```{r}
+# Put code to reverse engineer sentence here
+life_charges <- louisiana_parole |>
+  filter(offenses == "SECOND DEGREE MURDER") |>
+  group_by(doc_number) |>
+  summarise (
+    count = n()
+  ) |>
+  summarise(n())
+
+# Display results of code below this codeblock
+life_charges
+```
+
+### Sentence 3
+
+-   **Sentence text**: ... including over three-quarters of the 124 women serving life (parole is forbidden for almost all life sentences in the state).
+-   **Analysis summary**: We wanted to display the three-quarters approximation as a concrete percentage. We used the filter and group by functions to count the number of women serving life sentences for second degree murder, and then divided that answer by the total number of women serving life sentences. The answer we got was 77%.
+
+```{r}
+# Put code to reverse engineer sentence here
+
+louisiana_parole |>
+  filter(gender == "F" & offenses == "SECOND DEGREE MURDER") |>
+  group_by(doc_number) |>
+  summarise (
+   count = n()
+  ) |>
+  summarise(n()) /
+  
+louisiana_parole |>
+  filter(gender == "F") |>
+  group_by (doc_number)|>
+  summarise (
+    count = n()
+  ) |>
+  summarise (n()) 
+
+
+# Display results of code below this codeblock
+```
+
+### Sentence 4
+
+-   **Sentence text**: More than 70% of people serving life without parole are Black, according to our analysis of state data.
+-   **Analysis summary**: The 73% we got by using the number of Black inmates and dividing it by the total number of inmates serving life, which gave us our answer.
+
+```{r}
+# Put code to reverse engineer sentence here
+louisiana_parole |>
+  filter(race=="B") |>
+  group_by(doc_number) |>
+  summarise (
+    count = n()
+  ) |>
+  summarise(n())/
+
+louisiana_parole |>
+  group_by(doc_number) |>
+  summarise (
+    count = n()
+  ) |>
+  summarise(n())
+
+# Display results of code below this codeblock
+
+```
+
+### Sentence 5
+
+-   **Sentence text**: [Statement in the data notebook appendix]: More than half of the people serving life without parole are between the ages of 40 and 60.
+-   **Analysis summary**: We used OpenRefine to cleanse the data values that had categories listed as "40-50." The data values were listed in categories like "40 - 50." We also grouped by doc number to eget rid of any duplicate inmates. After counting in each category, we got 2,273 inmates and then divided by total number of inmates. Overall, 54% of the total inmates serving life without parole are between the ages of 40 and 50.
+
+```{r}
+# Put code to reverse engineer sentence here
+(louisiana_parole |>
+  filter(bucket_age =="40 to 50") |>
+  group_by(doc_number) |>
+  summarise(
+    count=n()
+    ) |>
+  summarise(n()) +
+
+louisiana_parole |>
+  filter(bucket_age=="50 to 60") |>
+  group_by(doc_number) |>
+  summarise(
+    count=n()
+    ) |>
+  summarise(n()) ) /
+  
+louisiana_parole |>
+  group_by(doc_number) |>
+  summarise (
+    count= n()
+  ) |>
+  summarise(n())
+
+# Display results of code below this codeblock
+
+```
+
+-30-
