@@ -1,6 +1,6 @@
 ---
 title: "lab_12"
-author: "Mitchell Hang"
+author: "Benji Ferraro"
 date: "2023-05-04"
 output: html_document
 ---
@@ -74,7 +74,7 @@ stop_words_plus <- stop_words |>
 ```
 
 |                                                                                                                                                                                                                                              |            |          |          |
-|----------------------------------------------------|-------|-------|-------|
+|-----------------------------------------|----------|----------|----------|
 | The top word is "failing," and it can indicate that these attorneys "failed" to comply with the law, hence their suspension. The rest of the words in the top 10 suggest some break of trust with the firm due to the attorney's suspension. | 1571       | 4.590614 |          |
 | **2**                                                                                                                                                                                                                                        | client     | 996      | 2.910409 |
 | **3**                                                                                                                                                                                                                                        | respondent | 599      | 1.750336 |
