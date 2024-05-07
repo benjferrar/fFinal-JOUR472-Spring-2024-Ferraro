@@ -58,19 +58,27 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
--   **Sentence text**: Compare the average rating across all board games between 1900 and 2000, and 2000-2022.
--   **Analysis summary**:
+-   **Sentence text**: Compare the average rating across all board games between 1900 and 1999, and 2000-2022.
+-   **Analysis summary**: We mutated the data so that we could compare both centuries in terms of average rating for board games. We mutated the years published and grouped by timespan for average rating, and got approximately 6.5 for the average rating from 2000 to 2022, and 6 for the average rating from 1900-1999. In terms of modern board games, it seems that the 21st century has a higher average score. This could be due to differing total amounts for each of the centuries, which could skew the data.
 
 ```{r}
 # Put code to reverse engineer sentence here
 
-board_games |>
-  group_by(rating_average) |>
+board_game_years <-board_game_data |>
+  mutate (
+    timespan = case_when(
+      between(year_published, 1900, 1999) ~ '1900-1999',
+      between(year_published, 2000, 2022) ~ '2000-2022',
+      .default = 'N/A'
+      ))
   
-  start_date <- as.Date("1900/01/01") |>
-
-  end_date <- as.Date("2023/01/01") |>
-  
+board_game_years |>
+  group_by(timespan) |>
+  summarise(
+    avg_rating = mean(rating_average)
+   ) |>
+  filter(timespan != 'N/A') |>
+  arrange(desc(avg_rating))
 
 # Display results of code below this codeblock
 
@@ -86,18 +94,20 @@ board_games |>
 
 # This code shows the number of reviews for games that are considered multiplayer (2 or more players) compared to those that are considered singleplayer (no more than 1 player)
 
-game_reviews <- game_reviews |>
+board_game_data <- board_game_data |>
   #Code for singleplayer or multiplayer
+  mutate(total_players = min_players+max_players) |>
   mutate(
    player_type = case_when(
-    max_players <= 1~ "Singleplayer",
-    max_players >= 2 ~ "Multiplayer",
+    total_players <= 1~ "Singleplayer",
+    total_players >= 2 ~ "Multiplayer",
         .default = NA
       )
   )
 #Group by player type and count the number of ratings. Also, a sum of the number of games considered multiplayer and singleplayer for context.
-game_reviews |> group_by(player_type)|>
-  summarise("# of Ratings" = sum(users_rated), "# of Games" = n())
+ board_game_data|> group_by(player_type)|>
+  summarise("# of Ratings" = sum(users_rated), "# of Games" = n()
+  avg_ratings_per_game = "# of Ratings"/"# of Games" )
 
 # Display results of code below this codeblock
 
@@ -120,11 +130,19 @@ game_reviews |> group_by(player_type)|>
 
 ### Sentence 4
 
--   **Sentence text**:
+-   **Sentence text**: What decades had the games owned by the most users?
 -   **Analysis summary**:
 
 ```{r}
 # Put code to reverse engineer sentence here
+
+board_game_owners <-board_game_data |>
+  mutate (
+    decades = case_when(
+      between(year_published, 1900, 1909) ~ '1900-1999',
+      between(year_published, 2000, 2022) ~ '2000-2022',
+      .default = 'N/A'
+      ))
 
 # Display results of code below this codeblock
 
@@ -132,7 +150,7 @@ game_reviews |> group_by(player_type)|>
 
 ### Sentence 5
 
--   **Sentence text**:
+-   **Sentence text**: What are domains with highest average ratings?
 -   **Analysis summary**:
 
 ```{r}
