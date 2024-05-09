@@ -150,11 +150,14 @@ board_game_owners <-board_game_data |>
 
 ### Sentence 5
 
--   **Sentence text**: What are domains with highest average ratings?
+-   **Sentence text**:
+-   
 -   **Analysis summary**:
 
 ```{r}
 # Put code to reverse engineer sentence here
+
+  
 
 # Display results of code below this codeblock
 

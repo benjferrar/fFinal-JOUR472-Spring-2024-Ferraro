@@ -75,4 +75,4 @@ md_attorney_sanctions <- read_csv("data/md_attorney_sanctions.csv")
 
 ```
 
-**A3.** 
+**A3.**
